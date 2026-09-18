@@ -1,0 +1,221 @@
+{
+  "name": "AI Customer Enquiry Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-enquiry",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1848ed33-8dcc-4efd-ba99-44dd861742a1",
+      "name": "Customer Enquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "ca46b33e-dc72-4eb7-8321-e6b23e54aa0b"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a friendly and helpful customer support assistant. Answer the customer enquiry clearly and concisely. If you do not know something, say so and offer to connect them with the team."
+            },
+            {
+              "content": "={{ $json.body.message }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 500
+        }
+      },
+      "id": "34b7900c-376a-478a-bb23-8a6dd5330715",
+      "name": "Generate AI Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DMHAEdR5xrfspd0X9NrQBdPNQvjuOCmJvuFdJ9asI5Q",
+          "mode": "list",
+          "cachedResultName": "Ai Customer Enquiries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DMHAEdR5xrfspd0X9NrQBdPNQvjuOCmJvuFdJ9asI5Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=gid=0",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $node[\"Customer Enquiry\"].json[\"body\"][\"name\"] }}",
+            "Email": "={{ $node[\"Customer Enquiry\"].json[\"body\"][\"email\"] }}",
+            "Customer Message": "={{ $node[\"Customer Enquiry\"].json[\"body\"][\"message\"] }}",
+            "Ai Reply": "={{ $json.output[0].content[0].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Message",
+              "displayName": "Customer Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ai Reply",
+              "displayName": "Ai Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        0
+      ],
+      "id": "760284ed-01a4-4a6d-a355-4e9f4de1b280",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9MZrBkvqM6ORZ4gK",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"reply\": \"{{ $('Generate AI Response').item.json.output[0].content[0].text }}\",\n  \"customer\": \"{{ $('Customer Enquiry').item.json.body.name }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        768,
+        0
+      ],
+      "id": "830c9d6c-d99b-440f-bed1-d5196f469438",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Customer Enquiry": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Response": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9eacfc61-0731-4f10-9617-022eed6e8d82",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f37b481d817a0dedaa1cb637bceccad0952dcfda8339055cce0702c421b3ddff"
+  },
+  "nodeGroups": [],
+  "id": "DKKvj5BPW1gtiueo",
+  "tags": []
+}
