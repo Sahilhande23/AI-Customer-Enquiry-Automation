@@ -8,6 +8,7 @@ Customer Enquiry
 → Webhook
 → AI Response
 → Google Sheets
+→ Gmail
 → Response to Customer
 
 ## Features
@@ -18,6 +19,9 @@ Customer Enquiry
 - Stores customer message and AI reply in Google Sheets
 - Returns the AI-generated response
 - No manual data entry required
+- Automatic Gmail response to customers
+- AI-generated email replies
+- Gmail API integration
 
 ## Technologies Used
 
