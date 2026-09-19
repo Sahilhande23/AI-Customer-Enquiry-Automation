@@ -1,6 +1,6 @@
 # AI Customer Enquiry Automation
 
-An AI-powered customer enquiry automation system built using n8n, AI, Webhooks and Google Sheets.
+An AI-powered customer enquiry automation system built using n8n, AI, Webhooks and Google Sheets, Gmail.
 
 ## Workflow
 
